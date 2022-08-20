@@ -36,13 +36,18 @@ def wrap(section, brackets):
 def parse(markdown):
     """ main loop """
     regex_collection = {
-        r"(# )(.*)": "h1",
+        r"\A(# )(.*)"     : "h1",
+        r"\A(#{2} )(.*)"  : "h2",
+        r"\A(#{3} )(.*)"  : "h3",
+        r"\A(#{4} )(.*)"  : "h4",
+        r"\A(#{5} )(.*)"  : "h5",
+        r"\A(#{6} )(.*)"  : "h6",
     }
 
     for pattern in regex_collection:
         match = re.search(pattern, markdown)
         if match:
-            return wrap(match.group(2), "h1")
+            return wrap(match.group(2), regex_collection[pattern])
 
 if __name__ == "__main__":
     options = get_options()
