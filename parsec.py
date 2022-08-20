@@ -16,6 +16,7 @@ In the short term, I will focus on:
 
 import argparse
 import pathlib
+import re
 
 def get_options():
     parser = argparse.ArgumentParser(
@@ -28,7 +29,22 @@ def get_options():
     )
     return parser.parse_args()
 
+def wrap(section, brackets):
+    """ wrap section in brackets """
+    return f"<{brackets}>{section}</{brackets}>"
+
+def parse(markdown):
+    """ main loop """
+    regex_collection = {
+        r"(# )(.*)": "h1",
+    }
+
+    for pattern in regex_collection:
+        match = re.search(pattern, markdown)
+        if match:
+            return wrap(match.group(2), "h1")
+
 if __name__ == "__main__":
     options = get_options()
     markdown = options.infile
-
+    parse(markdown)
