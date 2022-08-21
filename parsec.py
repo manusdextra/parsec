@@ -31,7 +31,8 @@ def get_options():
 
 def parse(markdown):
     """ main loop """
-    regex_collection = {
+    inline_patterns = {
+        # headings
         r"\A(# )(.*)"     : r"<h1>\2</h1>",
         r"\A(#{2} )(.*)"  : r"<h2>\2</h2>",
         r"\A(#{3} )(.*)"  : r"<h3>\2</h3>",
@@ -40,8 +41,8 @@ def parse(markdown):
         r"\A(#{6} )(.*)"  : r"<h6>\2</h6>",
     }
 
-    for pattern in regex_collection:
-        markdown = re.sub(pattern, regex_collection[pattern], markdown)
+    for pattern in inline_patterns:
+        markdown = re.sub(pattern, inline_patterns[pattern], markdown)
     return markdown
 
 if __name__ == "__main__":
