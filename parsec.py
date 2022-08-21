@@ -45,8 +45,7 @@ def parse(markdown):
     }
 
     for pattern in regex_collection:
-        match = re.search(pattern, markdown)
-        if match:
+        if match := re.search(pattern, markdown):
             return wrap(match.group(2), regex_collection[pattern])
 
 if __name__ == "__main__":
