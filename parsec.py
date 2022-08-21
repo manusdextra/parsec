@@ -29,24 +29,20 @@ def get_options():
     )
     return parser.parse_args()
 
-def wrap(section, brackets):
-    """ wrap section in brackets """
-    return f"<{brackets}>{section}</{brackets}>"
-
 def parse(markdown):
     """ main loop """
     regex_collection = {
-        r"\A(# )(.*)"     : "h1",
-        r"\A(#{2} )(.*)"  : "h2",
-        r"\A(#{3} )(.*)"  : "h3",
-        r"\A(#{4} )(.*)"  : "h4",
-        r"\A(#{5} )(.*)"  : "h5",
-        r"\A(#{6} )(.*)"  : "h6",
+        r"\A(# )(.*)"     : r"<h1>\2</h1>",
+        r"\A(#{2} )(.*)"  : r"<h2>\2</h2>",
+        r"\A(#{3} )(.*)"  : r"<h3>\2</h3>",
+        r"\A(#{4} )(.*)"  : r"<h4>\2</h4>",
+        r"\A(#{5} )(.*)"  : r"<h5>\2</h5>",
+        r"\A(#{6} )(.*)"  : r"<h6>\2</h6>",
     }
 
     for pattern in regex_collection:
-        if match := re.search(pattern, markdown):
-            return wrap(match.group(2), regex_collection[pattern])
+        markdown = re.sub(pattern, regex_collection[pattern], markdown)
+    return markdown
 
 if __name__ == "__main__":
     options = get_options()
