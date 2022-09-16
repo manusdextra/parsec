@@ -18,6 +18,23 @@ import argparse
 import pathlib
 import re
 
+# block_level_patterns = {
+#    r"\A(\s*[\-\*]\s*)(.*)$": "\n",
+#    r"\A(>\s)(.*)$"         : "\n",
+#    r"\A(.*)$"              : "[\-=]{3,}",
+# }
+
+single_line_patterns = {
+    # headings
+    r"^(#{6} )(.*)$"  : r"<h6>\2</h6>\n",
+    r"^(#{5} )(.*)$"  : r"<h5>\2</h5>\n",
+    r"^(#{4} )(.*)$"  : r"<h4>\2</h4>\n",
+    r"^(#{3} )(.*)$"  : r"<h3>\2</h3>\n",
+    r"^(#{2} )(.*)$"  : r"<h2>\2</h2>\n",
+    r"^(# )(.*)$"     : r"<h1>\2</h1>\n",
+}
+
+
 def get_options():
     parser = argparse.ArgumentParser(
             description="Parse markdown file and output HTML"
@@ -31,19 +48,30 @@ def get_options():
 
 def parse(markdown):
     """ main loop """
-    inline_patterns = {
-        # headings
-        r"\A(# )(.*)"     : r"<h1>\2</h1>",
-        r"\A(#{2} )(.*)"  : r"<h2>\2</h2>",
-        r"\A(#{3} )(.*)"  : r"<h3>\2</h3>",
-        r"\A(#{4} )(.*)"  : r"<h4>\2</h4>",
-        r"\A(#{5} )(.*)"  : r"<h5>\2</h5>",
-        r"\A(#{6} )(.*)"  : r"<h6>\2</h6>",
-    }
+    markdown = markdown.split('\n')
+    html = ""
+    """
+    Procedure:
+    - go through markdown line by line
+    - if multiline pattern is detected, add line to holding space and read in next one
+    - if any following line doesn't match the same pattern, process the holding space and
+      clear it
+    - Note: Would it be worth it using a manual for loop that can reset the index to an earlier line?
 
-    for pattern in inline_patterns:
-        markdown = re.sub(pattern, inline_patterns[pattern], markdown)
-    return markdown
+    TODO:
+    - [ ] expand multiline_patterns to include flags?
+          or a second regex to be applied to the entire holding space?
+    """
+    while markdown:
+        buffer = ""
+        line = markdown[0]
+        for key, val in single_line_patterns.items():
+            line = re.sub(key, val, line)
+        buffer += line
+        html += buffer
+        del markdown[0]
+
+    return html
 
 if __name__ == "__main__":
     options = get_options()
