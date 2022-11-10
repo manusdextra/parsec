@@ -5,8 +5,9 @@ actually use it for other projects, so I decided to flesh it out. The goal (for 
 is to implement the "Basic Syntax" according to markdownguide.org, and to follow the
 best practice described there.
 
-In the short term, I will focus on:  
-    - [ ] headings
-    - [ ] text styles
-    - [ ] paragraphs
-    - [ ] lists
+In the short term, I will focus on:
+
+- [ ] headings
+- [ ] text styles
+- [ ] paragraphs
+- [ ] lists
