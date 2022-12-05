@@ -18,37 +18,44 @@ import argparse
 import pathlib
 import re
 
-# block_level_patterns = {
-#    r"\A(\s*[\-\*]\s*)(.*)$": "\n",
-#    r"\A(>\s)(.*)$"         : "\n",
-#    r"\A(.*)$"              : "[\-=]{3,}",
-# }
-
-single_line_patterns = {
+paragraph = {
     # headings
-    r"^(#{6} )(.*)$"  : r"<h6>\2</h6>\n",
-    r"^(#{5} )(.*)$"  : r"<h5>\2</h5>\n",
-    r"^(#{4} )(.*)$"  : r"<h4>\2</h4>\n",
-    r"^(#{3} )(.*)$"  : r"<h3>\2</h3>\n",
-    r"^(#{2} )(.*)$"  : r"<h2>\2</h2>\n",
-    r"^(# )(.*)$"     : r"<h1>\2</h1>\n",
+    r"^(#{6} )(.*)": r"<h6>\2</h6>\n\n",
+    r"^(#{5} )(.*)": r"<h5>\2</h5>\n\n",
+    r"^(#{4} )(.*)": r"<h4>\2</h4>\n\n",
+    r"^(#{3} )(.*)": r"<h3>\2</h3>\n\n",
+    r"^(#{2} )(.*)": r"<h2>\2</h2>\n\n",
+    r"^(# )(.*)": r"<h1>\2</h1>\n\n",
+    # list
+    r"(<li>.*</li>)": r"<ul>\n\1\n</ul>\n",
+    # if it's not a heading or a list, it should be a paragraph?
+    # r"\n\n": r"<p>\2</p>",
+    # if it's missing a newline, add one
+    # r"^(.*)${1}": r"\1\n",
+}
+
+inline = {
+    # list items
+    r"^(\s*[\-\*])\s+(.*)": r"<li>\2</li>\n",
+    # r"^(>\s)(.*)$": r"<li>\2</li>",
+    # horizontal line
+    # r"^(.*)$"              : r"[\-=]{3,}",
 }
 
 
 def get_options():
-    parser = argparse.ArgumentParser(
-            description="Parse markdown file and output HTML"
-    )
+    parser = argparse.ArgumentParser(description="Parse markdown file and output HTML")
     parser.add_argument(
-            "infile",
-            type=pathlib.Path,
-            help="Path to Markdown formatted file to be converted to HTML"
+        "infile",
+        type=pathlib.Path,
+        help="Path to Markdown formatted file to be converted to HTML",
     )
     return parser.parse_args()
 
+
 def parse(markdown):
-    """ main loop """
-    markdown = markdown.split('\n')
+    """main loop"""
+    markdown = markdown.split("\n")
     html = ""
     """
     Procedure:
@@ -65,13 +72,18 @@ def parse(markdown):
     while markdown:
         buffer = ""
         line = markdown[0]
-        for key, val in single_line_patterns.items():
+
+        for key, val in inline.items():
             line = re.sub(key, val, line)
         buffer += line
-        html += buffer
         del markdown[0]
 
+        for key, val in paragraph.items():
+            buffer = re.sub(key, val, buffer, flags=re.DOTALL)
+        html += buffer
+
     return html
+
 
 if __name__ == "__main__":
     options = get_options()
