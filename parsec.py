@@ -57,6 +57,7 @@ def parse(markdown):
     """main loop"""
     markdown = markdown.split("\n")
     html = ""
+    buffer = ""
     """
     Procedure:
     - go through markdown line by line
@@ -70,7 +71,6 @@ def parse(markdown):
           or a second regex to be applied to the entire holding space?
     """
     while markdown:
-        buffer = ""
         line = markdown[0]
 
         for key, val in inline.items():
@@ -81,7 +81,7 @@ def parse(markdown):
         for key, val in paragraph.items():
             buffer = re.sub(key, val, buffer, flags=re.DOTALL)
         html += buffer
-
+        buffer = ""
     return html
 
 
